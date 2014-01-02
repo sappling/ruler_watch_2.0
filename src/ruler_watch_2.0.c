@@ -12,7 +12,7 @@
 #endif
 
 #define DEBUG_MODE 0
-#define PULSE_MODE 1
+#define PULSE_MODE 0
 
 #define LINE_LEVEL 80 // height of marker live.
 #define GRADIENT 4 // distance each 5 min line apart
@@ -31,7 +31,8 @@ Window *window;
 Layer *rootLayer;
 Layer *rulerLayer; // The board/grid
 Layer *lineLayer; // The board/grid
-Layer *bgLayer;   // the bakcground
+Layer *bgLayer;   // the background
+InverterLayer *invertLayer;
 
 TextLayer *hourLayers[30];
 char hourStrings[30][13];
@@ -73,6 +74,15 @@ void deinit_hours() {
 	for (i = 0; i < 30; i++) {
 		text_layer_destroy(hourLayers[i]);
 	}
+}
+
+void init_invert() {
+	invertLayer = inverter_layer_create(layer_get_frame(rootLayer)); // Associate with layer object and set dimensions
+	layer_add_child(rootLayer, (Layer*)invertLayer);
+}
+
+void deinit_invert() {
+	inverter_layer_destroy(invertLayer);
 }
 
 
@@ -216,6 +226,7 @@ void handle_init() {
 	init_bg_layer();
 	init_ruler_layer();
 	init_hours();
+	//init_invert();
 
 	t = time(NULL);
 	now = localtime(&t);
@@ -228,6 +239,7 @@ void handle_init() {
 
 void handle_deinit() {
 	tick_timer_service_unsubscribe();
+	//deinit_invert();
 	deinit_hours();
 	deinit_layers();
 	window_destroy(window);
